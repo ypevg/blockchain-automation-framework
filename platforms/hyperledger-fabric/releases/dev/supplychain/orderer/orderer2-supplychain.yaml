@@ -1,0 +1,58 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: supplychain-orderer2
+  namespace: supplychain-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: supplychain-orderer2
+  chart:
+    git: git@github.com:ypevg/blockchain-automation-framework.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/orderernode
+  values:
+    metadata:
+      namespace: supplychain-net
+      images:
+        orderer: hyperledger/fabric-orderer:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    annotations:  
+      service:
+        - example1: example2
+      pvc:
+      deployment:
+    orderer:
+      name: orderer2
+      loglevel: info
+      localmspid: supplychainMSP
+      tlsstatus: true
+      keepaliveserverinterval: 10s
+    
+    consensus:
+      name: raft
+
+    storage:
+      storageclassname: supplychainsc
+      storagesize: 512Mi  
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7050
+
+    vault:
+      address: https://vault.test.b2bchain.tech
+      role: vault-role
+      authpath: devsupplychain-net-auth
+      secretprefix: secret/crypto/ordererOrganizations/supplychain-net/orderers/orderer2.supplychain-net
+      imagesecretname: regcred
+      serviceaccountname: vault-auth
+
+    proxy:
+      provider: haproxy
+      external_url_suffix: org1ambassador.gcptest.b2bchain.tech
+
+    genesis: |-
+      
