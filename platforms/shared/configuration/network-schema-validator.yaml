@@ -27,6 +27,7 @@
     - name: "run schema validator on network.yaml"
       shell: |
         ajv validate -s ../../network-schema.json -d ./build/temp.yaml
+      ignore_errors: yes
     - name: Remove the build directory and contents
       file:
         path: "./build"
